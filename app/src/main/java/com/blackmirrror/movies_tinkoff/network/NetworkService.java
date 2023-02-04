@@ -9,7 +9,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NetworkService {
-    private static NetworkService instance;
+    private static NetworkService mInstance;
     private static final String BASE_URL = "https://kinopoiskapiunofficial.tech/";
     private static final String KEY_API = " e30ffed0-76ab-4dd6-b41f-4c9da2b2735b";
     private Retrofit retrofit;
@@ -36,10 +36,10 @@ public class NetworkService {
     }
 
     public static NetworkService getInstance() {
-        if (instance == null) {
-            instance = new NetworkService();
+        if (mInstance == null) {
+            mInstance = new NetworkService();
         }
-        return instance;
+        return mInstance;
     }
 
     public JSONPlaceHolderApi getJSONApi() {

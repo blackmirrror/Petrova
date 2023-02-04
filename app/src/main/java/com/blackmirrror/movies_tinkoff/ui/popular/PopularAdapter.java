@@ -27,6 +27,10 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularV
         }
     }
 
+    public PopularAdapter(List<Movie> listMovies) {
+        this.listMovies = listMovies;
+    }
+
     @NonNull
     @Override
     public PopularViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -41,11 +45,11 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularV
         TextView tvGenre = holder.itemView.findViewById(R.id.tv_item_genre);
 
         tvTitle.setText(listMovies.get(position).getId());
-        tvGenre.setText(listMovies.get(position).getGenres().get(0) +
-                " (" + listMovies.get(position).getYear() + ")");
-        Picasso.get()
-                .load(listMovies.get(position).getPosterUrlPreview())
-                .into(ivPoster);
+//        tvGenre.setText(listMovies.get(position).getGenres().get(0) +
+//                " (" + listMovies.get(position).getYear() + ")");
+//        Picasso.get()
+//                .load(listMovies.get(position).getPosterUrlPreview())
+//                .into(ivPoster);
     }
 
     @Override
