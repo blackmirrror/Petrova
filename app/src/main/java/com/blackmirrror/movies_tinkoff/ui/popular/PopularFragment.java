@@ -86,6 +86,8 @@ public class PopularFragment extends Fragment {
 //        rvPopular.setAdapter(adapter);
     }
 
+
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
