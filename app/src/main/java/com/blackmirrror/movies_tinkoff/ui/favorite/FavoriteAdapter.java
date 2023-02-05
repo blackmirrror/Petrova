@@ -2,6 +2,7 @@ package com.blackmirrror.movies_tinkoff.ui.favorite;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.blackmirrror.movies_tinkoff.MovieActivity;
 import com.blackmirrror.movies_tinkoff.R;
 import com.blackmirrror.movies_tinkoff.database.FavoriteContentProvider;
 import com.blackmirrror.movies_tinkoff.database.FavoriteContract;
@@ -30,6 +32,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
+        Context context;
+
         final ImageView ivPoster;
         final TextView tvTitle;
         final TextView tvGenre;
@@ -38,18 +42,21 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
             ivPoster = itemView.findViewById(R.id.iv_item_poster);
             tvTitle = itemView.findViewById(R.id.tv_item_title);
             tvGenre = itemView.findViewById(R.id.tv_item_genre);
+            context = itemView.getContext();
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, MovieActivity.class);
+                    intent.putExtra("id", (Integer) itemView.getTag());
+                    intent.putExtra("isFavorite", true);
+                    context.startActivity(intent);
+                }
+            });
         }
     }
 
     @SuppressLint("Range")
     public FavoriteAdapter(Context context, Cursor cursor) {
-//        FavoriteContentProvider provider = new FavoriteContentProvider();
-//        Cursor cursor = provider.query(FavoriteContract.Favorite.CONTENT_URI, new String[]{
-//                FavoriteContract.Favorite.KEY_TITLE,
-//                FavoriteContract.Favorite.KEY_YEAR,
-//                FavoriteContract.Favorite.KEY_GENRES,
-//                FavoriteContract.Favorite.KEY_POSTER_URL_PREVIEW
-//        }, null, null, null, null);
         if ( cursor != null && cursor.moveToFirst()) {
             do {
                 Movie movie = new Movie();
@@ -64,17 +71,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
                 listMovies.add(movie);
             } while (cursor.moveToNext());
         }
-//        Movie movie = new Movie();
-//        movie.setTitle("Title");
-//        List<Movie.Genre> l = new ArrayList<>();
-//        Movie.Genre g = new Movie.Genre();
-//        g.setGenre("gg");
-//        l.add(g);
-//        movie.setGenres(l);
-//        movie.setPosterUrlPreview("gfgd");
-//        listMovies.add(movie);
-//        listMovies.add(movie);
-//        listMovies.add(movie);
     }
 
     @NonNull

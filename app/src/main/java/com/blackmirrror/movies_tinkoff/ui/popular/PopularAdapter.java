@@ -1,8 +1,10 @@
 package com.blackmirrror.movies_tinkoff.ui.popular;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.blackmirrror.movies_tinkoff.MovieActivity;
 import com.blackmirrror.movies_tinkoff.R;
 import com.blackmirrror.movies_tinkoff.database.FavoriteContract;
 import com.blackmirrror.movies_tinkoff.model.Movie;
@@ -32,16 +35,18 @@ import retrofit2.Response;
 public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularViewHolder> {
 
     private List<Movie> listMovies;
-    Context context;
+    static Context context;
 
     static class PopularViewHolder extends RecyclerView.ViewHolder {
 
+        Context context;
         final ImageView ivPoster;
         final TextView tvTitle;
         final TextView tvGenre;
         final TextView tvAddFavorite;
         public PopularViewHolder(@NonNull View itemView) {
             super(itemView);
+            context = itemView.getContext();
             ivPoster = itemView.findViewById(R.id.iv_item_poster);
             tvTitle = itemView.findViewById(R.id.tv_item_title);
             tvGenre = itemView.findViewById(R.id.tv_item_genre);
@@ -53,7 +58,10 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularV
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    Intent intent = new Intent(context, MovieActivity.class);
+                    intent.putExtra("id", (Integer) itemView.getTag());
+                    intent.putExtra("isFavorite", false);
+                    context.startActivity(intent);
                 }
             });
         }
