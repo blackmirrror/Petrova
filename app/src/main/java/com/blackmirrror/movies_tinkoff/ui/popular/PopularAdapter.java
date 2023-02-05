@@ -1,12 +1,10 @@
 package com.blackmirrror.movies_tinkoff.ui.popular;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +21,6 @@ import com.blackmirrror.movies_tinkoff.R;
 import com.blackmirrror.movies_tinkoff.database.FavoriteContract;
 import com.blackmirrror.movies_tinkoff.model.Movie;
 import com.blackmirrror.movies_tinkoff.network.NetworkService;
-import com.blackmirrror.movies_tinkoff.ui.favorite.FavoriteAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -53,16 +50,14 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularV
             tvAddFavorite = itemView.findViewById(R.id.tv_add_favorite);
             itemView.setOnLongClickListener(v -> {
                 addToFavorite((Integer) itemView.getTag());
+                tvAddFavorite.setVisibility(View.VISIBLE);
                 return true;
             });
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, MovieActivity.class);
-                    intent.putExtra("id", (Integer) itemView.getTag());
-                    intent.putExtra("isFavorite", false);
-                    context.startActivity(intent);
-                }
+            itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(context, MovieActivity.class);
+                intent.putExtra("id", (Integer) itemView.getTag());
+                intent.putExtra("isFavorite", false);
+                context.startActivity(intent);
             });
         }
         private void addToFavorite(int id) {
@@ -86,10 +81,18 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularV
             ContentValues contentValues = new ContentValues();
             contentValues.put(FavoriteContract.Favorite.KEY_ID, movie.getId());
             contentValues.put(FavoriteContract.Favorite.KEY_TITLE, movie.getTitle());
-            contentValues.put(FavoriteContract.Favorite.KEY_GENRES, movie.getGenres().get(0).getGenre());
+            String genres = "";
+            for (int i = 0; i < movie.getGenres().size() - 1; i++)
+                genres += movie.getGenres().get(i).getGenre() + " ";
+            genres += movie.getGenres().get(movie.getGenres().size() - 1).getGenre();
+            contentValues.put(FavoriteContract.Favorite.KEY_GENRES, genres);
             contentValues.put(FavoriteContract.Favorite.KEY_POSTER_URL, movie.getPosterUrl());
             contentValues.put(FavoriteContract.Favorite.KEY_POSTER_URL_PREVIEW, movie.getPosterUrlPreview());
-            contentValues.put(FavoriteContract.Favorite.KEY_COUNTRIES, movie.getCountries().get(0).getCountry());
+            String countries = "";
+            for (int i = 0; i < movie.getCountries().size() - 1; i++)
+                countries += movie.getCountries().get(i).getCountry() + " ";
+            countries += movie.getCountries().get(movie.getGenres().size() - 1).getCountry();
+            contentValues.put(FavoriteContract.Favorite.KEY_COUNTRIES, countries);
             contentValues.put(FavoriteContract.Favorite.KEY_YEAR, movie.getYear());
             contentValues.put(FavoriteContract.Favorite.KEY_DESCRIPTION, movie.getDescription());
 

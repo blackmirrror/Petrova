@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Movies_tinkoff</string>
+    <string name="app_name">Фильмы</string>
     <string name="title_home">Популярные</string>
     <string name="title_dashboard">Избранное</string>
 </resources>

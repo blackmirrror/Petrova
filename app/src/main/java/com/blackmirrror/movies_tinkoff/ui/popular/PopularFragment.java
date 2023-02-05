@@ -55,24 +55,6 @@ public class PopularFragment extends Fragment {
     }
 
     private void initPopular(int page) {
-//        NetworkService.getInstance()
-//                .getJSONApi()
-//                .getPostWithID(301)
-//                .enqueue(new Callback<Movie>() {
-//                    @Override
-//                    public void onResponse(@NonNull Call<Movie> call, @NonNull Response<Movie> response) {
-//                        Movie post = response.body();
-//
-//                        textView.append(post.getId() + "\n");
-//                        textView.append(post.getTitle() + "\n");
-//                    }
-//
-//                    @Override
-//                    public void onFailure(@NonNull Call<Movie> call, @NonNull Throwable t) {
-//                        textView.append("Error occurred while getting request!");
-//                        t.printStackTrace();
-//                    }
-//                });
         NetworkService.getInstance()
                 .getJSONApi()
                 .getPosts(page, "TOP_100_POPULAR_FILMS")

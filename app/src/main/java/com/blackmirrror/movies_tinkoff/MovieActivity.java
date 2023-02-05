@@ -2,14 +2,11 @@ package com.blackmirrror.movies_tinkoff;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NavUtils;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -34,7 +31,7 @@ public class MovieActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
-        setTitle("");
+        setTitle("Описание");
         initViews();
     }
 
@@ -46,7 +43,7 @@ public class MovieActivity extends AppCompatActivity {
         tvCountries = findViewById(R.id.tv_movie_countries);
 
         Intent intent = getIntent();
-        id = intent.getIntExtra("id", 0);
+        id = intent.getIntExtra("id", 1);
         boolean isFavorite = intent.getBooleanExtra("isFavorite", false);
         if (isFavorite)
             getFromDb(id);
@@ -87,33 +84,33 @@ public class MovieActivity extends AppCompatActivity {
 
     @SuppressLint("Range")
     private void getFromDb(int id) {
-        Cursor cursor = getContentResolver().query(FavoriteContract.Favorite.CONTENT_URI, new String[]{
+        Cursor cursor = this.getContentResolver().query(FavoriteContract.Favorite.CONTENT_URI, new String[]{
+                FavoriteContract.Favorite.KEY_ID,
                 FavoriteContract.Favorite.KEY_TITLE,
                 FavoriteContract.Favorite.KEY_YEAR,
                 FavoriteContract.Favorite.KEY_GENRES,
                 FavoriteContract.Favorite.KEY_POSTER_URL,
-                FavoriteContract.Favorite.KEY_COUNTRIES
+                FavoriteContract.Favorite.KEY_COUNTRIES,
+                        FavoriteContract.Favorite.KEY_DESCRIPTION
         },
                 FavoriteContract.Favorite.KEY_ID + "=?",
                 new String[] {String.valueOf(id)},
                 null, null);
-        tvTitle.setText(cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_TITLE)));
-        tvDescription.setText(cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_DESCRIPTION)));
-        tvTitle.setText(cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_TITLE)));
-    }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.bottom_nav_menu, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        if (item.getItemId() == android.R.id.home) {
-//            NavUtils.navigateUpFromSameTask(this);
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
+        if (cursor != null && cursor.moveToFirst()) {
+            tvTitle.setText(cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_TITLE)));
+            tvDescription.setText(cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_DESCRIPTION)));
+            String[] genres = cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_GENRES)).split(" ");
+            for (int i = 0; i < genres.length - 1; i++)
+                tvGenres.append(genres[i] + ", ");
+            tvGenres.append(genres[genres.length - 1]);
+            String[] countries = cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_COUNTRIES)).split(" ");
+            for (int i = 0; i < countries.length - 1; i++)
+                tvCountries.append(countries[i] + ", ");
+            tvCountries.append(countries[countries.length - 1]);
+            Picasso.get()
+                    .load(cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_POSTER_URL)))
+                    .into(ivPoster);
+        }
+    }
 }

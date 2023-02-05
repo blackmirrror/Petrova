@@ -20,7 +20,7 @@ public class Movie {
         }
     }
 
-    public class Country {
+    public static class Country {
         @SerializedName("country")
         private String country;
         public Country() {}

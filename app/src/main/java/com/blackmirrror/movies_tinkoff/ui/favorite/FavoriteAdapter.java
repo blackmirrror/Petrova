@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,11 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.blackmirrror.movies_tinkoff.MovieActivity;
 import com.blackmirrror.movies_tinkoff.R;
-import com.blackmirrror.movies_tinkoff.database.FavoriteContentProvider;
 import com.blackmirrror.movies_tinkoff.database.FavoriteContract;
-import com.blackmirrror.movies_tinkoff.database.FavoriteDbHelper;
 import com.blackmirrror.movies_tinkoff.model.Movie;
-import com.blackmirrror.movies_tinkoff.ui.popular.PopularAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -43,14 +39,11 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
             tvTitle = itemView.findViewById(R.id.tv_item_title);
             tvGenre = itemView.findViewById(R.id.tv_item_genre);
             context = itemView.getContext();
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, MovieActivity.class);
-                    intent.putExtra("id", (Integer) itemView.getTag());
-                    intent.putExtra("isFavorite", true);
-                    context.startActivity(intent);
-                }
+            itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(context, MovieActivity.class);
+                intent.putExtra("id", (Integer) itemView.getTag());
+                intent.putExtra("isFavorite", true);
+                context.startActivity(intent);
             });
         }
     }
@@ -60,16 +53,34 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         if ( cursor != null && cursor.moveToFirst()) {
             do {
                 Movie movie = new Movie();
+                movie.setId(cursor.getInt(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_ID)));
                 movie.setTitle(cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_TITLE)));
                 movie.setYear(Integer.parseInt(cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_YEAR))));
                 movie.setPosterUrlPreview(cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_POSTER_URL_PREVIEW)));
-                List<Movie.Genre> l = new ArrayList<>();
+                movie.setPosterUrl(cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_POSTER_URL)));
+                movie.setDescription(cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_DESCRIPTION)));
+
+                String[] genres = cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_GENRES)).split(" ");
+                List<Movie.Genre> genresList = new ArrayList<>();
                 Movie.Genre g = new Movie.Genre();
-                g.setGenre(cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_GENRES)));
-                l.add(g);
-                movie.setGenres(l);
+                for (String s : genres) {
+                    g.setGenre(s);
+                    genresList.add(g);
+                }
+                movie.setGenres(genresList);
+
+                String[] countries = cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorite.KEY_COUNTRIES)).split(" ");
+                List<Movie.Country> countryList = new ArrayList<>();
+                Movie.Country c = new Movie.Country();
+                for (String s : countries) {
+                    c.setCountry(s);
+                    countryList.add(c);
+                }
+                movie.setCountries(countryList);
+
                 listMovies.add(movie);
             } while (cursor.moveToNext());
+            cursor.close();
         }
     }
 

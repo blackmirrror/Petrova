@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,7 +37,6 @@ public class FavoriteContentProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        favoriteDbHelper = new FavoriteDbHelper(getContext());
         SQLiteDatabase db = favoriteDbHelper.getReadableDatabase();
         Cursor cursor;
         int match = uriMatcher.match(uri);
@@ -54,7 +52,6 @@ public class FavoriteContentProvider extends ContentProvider {
                         projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             default:
-                //Toast.makeText(getContext(), "Incorrect Uri", Toast.LENGTH_SHORT).show();
                 throw new IllegalArgumentException("Can't query incorrect URI " + uri);
         }
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
@@ -80,7 +77,6 @@ public class FavoriteContentProvider extends ContentProvider {
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
         for (Map.Entry e : values.valueSet()) {
             if (e.getValue().equals("")) {
-                //Toast.makeText(getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return null;
             }
         }

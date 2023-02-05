@@ -1,14 +1,10 @@
 package com.blackmirrror.movies_tinkoff.ui.favorite;
 
-import android.content.Context;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,8 +15,6 @@ import com.blackmirrror.movies_tinkoff.database.FavoriteContract;
 import com.blackmirrror.movies_tinkoff.databinding.FragmentFavoriteBinding;
 
 public class FavoriteFragment extends Fragment {
-
-    private static final int MEMBER_LOADER = 123;
     private FragmentFavoriteBinding binding;
     FavoriteAdapter favoriteAdapter;
     RecyclerView rvFavorite;
@@ -41,13 +35,18 @@ public class FavoriteFragment extends Fragment {
     private void initFavorite() {
         rvFavorite = binding.rvFavorite;
         Cursor cursor = this.getContext().getContentResolver().query(FavoriteContract.Favorite.CONTENT_URI, new String[]{
+                FavoriteContract.Favorite.KEY_ID,
                 FavoriteContract.Favorite.KEY_TITLE,
                 FavoriteContract.Favorite.KEY_YEAR,
                 FavoriteContract.Favorite.KEY_GENRES,
-                FavoriteContract.Favorite.KEY_POSTER_URL_PREVIEW
+                FavoriteContract.Favorite.KEY_POSTER_URL_PREVIEW,
+                FavoriteContract.Favorite.KEY_POSTER_URL,
+                FavoriteContract.Favorite.KEY_DESCRIPTION,
+                FavoriteContract.Favorite.KEY_COUNTRIES,
         }, null, null, null, null);
         favoriteAdapter = new FavoriteAdapter(this.getContext(), cursor);
         rvFavorite.setAdapter(favoriteAdapter);
+        cursor.close();
     }
 
     @Override
