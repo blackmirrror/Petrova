@@ -16,7 +16,6 @@ public final class FavoriteContract {
         public static final String TABLE_NAME = "favorite";
         public static final String KEY_ID = "id";
         public static final String KEY_TITLE = "title";
-        public static final String KEY_FILM_ID = "filmId";
         public static final String KEY_POSTER_URL = "posterUrl";
         public static final String KEY_POSTER_URL_PREVIEW = "posterUrlPreview";
         public static final String KEY_YEAR = "year";

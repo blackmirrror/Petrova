@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Movie {
 
-    public class Genre {
+    public static class Genre {
         @SerializedName("genre")
         private String genre;
         public Genre() {};

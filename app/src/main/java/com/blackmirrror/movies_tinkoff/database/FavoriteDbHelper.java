@@ -16,7 +16,6 @@ public class FavoriteDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + Favorite.TABLE_NAME +
                 "(" + Favorite.KEY_ID + " INTEGER PRIMARY KEY," +
-                Favorite.KEY_FILM_ID + " INTEGER," +
                 Favorite.KEY_TITLE + " TEXT," +
                 Favorite.KEY_YEAR + " INTEGER," +
                 Favorite.KEY_POSTER_URL + " TEXT," +

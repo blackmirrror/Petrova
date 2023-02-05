@@ -2,6 +2,8 @@ package com.blackmirrror.movies_tinkoff.ui.popular;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -17,13 +19,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.blackmirrror.movies_tinkoff.R;
 import com.blackmirrror.movies_tinkoff.database.FavoriteContract;
 import com.blackmirrror.movies_tinkoff.model.Movie;
+import com.blackmirrror.movies_tinkoff.network.NetworkService;
+import com.blackmirrror.movies_tinkoff.ui.favorite.FavoriteAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularViewHolder> {
 
     private List<Movie> listMovies;
+    Context context;
 
     static class PopularViewHolder extends RecyclerView.ViewHolder {
 
@@ -38,24 +47,43 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularV
             tvGenre = itemView.findViewById(R.id.tv_item_genre);
             tvAddFavorite = itemView.findViewById(R.id.tv_add_favorite);
             itemView.setOnLongClickListener(v -> {
-                addToFavorite();
+                addToFavorite((Integer) itemView.getTag());
                 return true;
             });
-        }
-        private void addToFavorite() {
-            String title = tvTitle.getText().toString().trim();
-            String genre  = tvGenre.getText().toString().trim();
-            String url = ivPoster.getResources().toString();
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
+                }
+            });
+        }
+        private void addToFavorite(int id) {
+            NetworkService.getInstance()
+                .getJSONApi()
+                .getPostWithID(id)
+                .enqueue(new Callback<Movie>() {
+                    @Override
+                    public void onResponse(@NonNull Call<Movie> call, @NonNull Response<Movie> response) {
+                        Movie post = response.body();
+                        addMovie(post);
+                    }
+                    @Override
+                    public void onFailure(@NonNull Call<Movie> call, @NonNull Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
+        }
+
+        private void addMovie(Movie movie) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(FavoriteContract.Favorite.KEY_TITLE, title);
-            contentValues.put(FavoriteContract.Favorite.KEY_GENRES, genre);
-            contentValues.put(FavoriteContract.Favorite.KEY_POSTER_URL, url);
-            contentValues.put(FavoriteContract.Favorite.KEY_POSTER_URL_PREVIEW, url);
-            contentValues.put(FavoriteContract.Favorite.KEY_COUNTRIES, url);
-            contentValues.put(FavoriteContract.Favorite.KEY_FILM_ID, url);
-            contentValues.put(FavoriteContract.Favorite.KEY_YEAR, url);
-            contentValues.put(FavoriteContract.Favorite.KEY_DESCRIPTION, url);
+            contentValues.put(FavoriteContract.Favorite.KEY_ID, movie.getId());
+            contentValues.put(FavoriteContract.Favorite.KEY_TITLE, movie.getTitle());
+            contentValues.put(FavoriteContract.Favorite.KEY_GENRES, movie.getGenres().get(0).getGenre());
+            contentValues.put(FavoriteContract.Favorite.KEY_POSTER_URL, movie.getPosterUrl());
+            contentValues.put(FavoriteContract.Favorite.KEY_POSTER_URL_PREVIEW, movie.getPosterUrlPreview());
+            contentValues.put(FavoriteContract.Favorite.KEY_COUNTRIES, movie.getCountries().get(0).getCountry());
+            contentValues.put(FavoriteContract.Favorite.KEY_YEAR, movie.getYear());
+            contentValues.put(FavoriteContract.Favorite.KEY_DESCRIPTION, movie.getDescription());
 
             ContentResolver contentResolver = this.itemView.getContext().getContentResolver();
             Uri uri = contentResolver.insert(FavoriteContract.Favorite.CONTENT_URI, contentValues);
@@ -66,7 +94,8 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularV
         }
     }
 
-    public PopularAdapter(List<Movie> listMovies) {
+    public PopularAdapter(List<Movie> listMovies, Context context) {
+        this.context = context;
         this.listMovies = listMovies;
     }
 
@@ -79,6 +108,7 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularV
 
     @Override
     public void onBindViewHolder(@NonNull PopularViewHolder holder, int position) {
+        holder.itemView.setTag(listMovies.get(position).getId());
         String title = listMovies.get(position).getTitle();
         if (title.length() > 15)
             title = title.substring(0, 14) + "...";
@@ -88,12 +118,22 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularV
         Picasso.get()
                 .load(listMovies.get(position).getPosterUrlPreview())
                 .into(holder.ivPoster);
-        holder.tvAddFavorite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                holder.tvAddFavorite.setBackgroundResource(R.drawable.ic_dashboard_black_24dp);
-            }
-        });
+
+        if (isFavorite(listMovies.get(position).getId()))
+            holder.tvAddFavorite.setVisibility(View.VISIBLE);
+        else
+            holder.tvAddFavorite.setVisibility(View.INVISIBLE);
+    }
+
+    private boolean isFavorite(int id) {
+        Cursor cursor = context.getContentResolver().query(FavoriteContract.Favorite.CONTENT_URI, new String[]{
+                FavoriteContract.Favorite.KEY_TITLE,
+                FavoriteContract.Favorite.KEY_YEAR,
+                FavoriteContract.Favorite.KEY_GENRES,
+                FavoriteContract.Favorite.KEY_POSTER_URL_PREVIEW
+        }, FavoriteContract.Favorite.KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null);
+        if (cursor == null) return false;
+        else return cursor.moveToFirst();
     }
 
     @Override

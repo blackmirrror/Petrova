@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,10 +35,30 @@ public class FavoriteContentProvider extends ContentProvider {
         return true;
     }
 
-    @Nullable
+
     @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        return null;
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        favoriteDbHelper = new FavoriteDbHelper(getContext());
+        SQLiteDatabase db = favoriteDbHelper.getReadableDatabase();
+        Cursor cursor;
+        int match = uriMatcher.match(uri);
+        switch (match) {
+            case FILMS:
+                cursor = db.query(Favorite.TABLE_NAME,
+                        projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case FILMS_ID:
+                selection = Favorite.KEY_ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = db.query(Favorite.TABLE_NAME,
+                        projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            default:
+                //Toast.makeText(getContext(), "Incorrect Uri", Toast.LENGTH_SHORT).show();
+                throw new IllegalArgumentException("Can't query incorrect URI " + uri);
+        }
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return cursor;
     }
 
     @Nullable
